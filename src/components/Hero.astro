@@ -89,10 +89,9 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    padding: 2rem 0 0;
-    min-height: 100svh;
-    display: grid;
-    align-items: center;
+    /* Altura fixa, não a viewport inteira — em telas altas isso evitava que a
+       foto ficasse "flutuando" acima da borda inferior da seção. */
+    height: 760px;
   }
 
   /* --- Fundo: foto do espaço, escurecida e aquecida para não brigar com o dourado --- */
@@ -129,18 +128,21 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
       );
   }
 
-  /* Texto e imagem com metade da largura cada */
+  /* Texto e imagem com metade da largura cada, ocupando a altura fixa da seção */
   .hero__inner {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    align-items: center;
+    align-items: stretch;
     gap: 2rem;
-    width: 100%;
+    height: 100%;
   }
 
-  /* --- Coluna de texto --- */
+  /* --- Coluna de texto: centralizada verticalmente, independente da foto --- */
   .hero__content {
-    padding: 2rem 0 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 0;
   }
 
   .hero__logo {
@@ -193,13 +195,15 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     flex-shrink: 0;
   }
 
-  /* --- Coluna da foto: recorte dos proprietários sob luz dourada --- */
+  /* --- Coluna da foto: recorte dos proprietários sob luz dourada ---
+     Ocupa a altura inteira da seção (align-self: stretch, herdado do grid) e
+     empurra a imagem para a base com align-items: flex-end — assim ela cola
+     na borda inferior da seção sempre, não na borda do texto ao lado. */
   .hero__figure {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    align-self: end;
   }
 
   /* A "luz de palco" dourada que nasce atrás do recorte */
@@ -227,11 +231,11 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     max-width: 32rem;
     height: auto;
     display: block;
-    filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
-    /* O recorte termina reto na altura da coxa; dissolver a base evita a
-       linha de corte e integra a figura ao escuro do fundo. */
-    mask-image: linear-gradient(to bottom, #000 78%, transparent 99%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 99%);
+    /* Sem drop-shadow: como a figura quase preenche o retângulo da foto, o
+       blur do shadow acompanhava esse contorno reto e virava uma "caixa"
+       escura atrás deles. A elevação já vem do glow dourado, não de sombra. */
+    mask-image: linear-gradient(to bottom, #000 85%, transparent 99%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 99%);
   }
 
   /* --- Entrada suave, no ritmo do design system --- */
@@ -254,12 +258,13 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
   /* --- Responsivo --- */
   @media (max-width: 900px) {
     .hero {
-      min-height: 0;
+      /* No mobile o conteúdo empilha, então a altura acompanha o conteúdo */
+      height: auto;
       padding-top: 2rem;
-      align-items: stretch;
     }
     .hero__inner {
       grid-template-columns: 1fr;
+      height: auto;
       gap: 0;
     }
     .hero__content {
