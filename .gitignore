@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# materiais brutos do cliente (PDF, fotos originais) — assets otimizados já
+# estão em src/assets/; originais ficam só localmente
+.context/

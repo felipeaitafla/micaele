@@ -1,0 +1,174 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+import { sanityFetch } from '../lib/sanity';
+import { settings as fallback } from '../lib/content';
+
+const cfg = await sanityFetch<any>(`*[_type == "siteSettings"][0]`);
+const s = { ...fallback, ...(cfg ?? {}) };
+
+const year = new Date().getFullYear();
+
+const socials = [
+  { url: s.instagram, label: 'Instagram' },
+  { url: s.facebook, label: 'Facebook' },
+  { url: s.youtube, label: 'YouTube' },
+].filter((item) => Boolean(item.url));
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__col footer__brand">
+        <Image src={logo} alt={s.companyName} class="footer__logo" widths={[200, 400]} loading="lazy" />
+        <address class="footer__text">{s.address}</address>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Horário de atendimento</h2>
+        <p class="footer__text">{s.hours1}</p>
+        <p class="footer__text">{s.hours2}</p>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Contato</h2>
+        <p class="footer__text">
+          <a href={`tel:+${s.phone}`}>{s.phoneDisplay}</a>
+        </p>
+        {s.phone2 && <p class="footer__text">{s.phone2}</p>}
+        <h2 class="footer__title footer__title--spaced">E-mail</h2>
+        <p class="footer__text">
+          <a href={`mailto:${s.email}`}>{s.email}</a>
+        </p>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Redes sociais</h2>
+        <ul class="footer__socials">
+          {socials.map((item) => (
+            <li>
+              <a href={item.url} target="_blank" rel="noopener noreferrer">{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__legal">
+      <p>&copy; {year} — Direitos reservados{s.cnpj && ` — CNPJ ${s.cnpj}`}</p>
+      <p><a href="/politica-de-privacidade">Política de Privacidade</a></p>
+    </div>
+
+    <div class="ornament-divider footer__divider" aria-hidden="true">&#9670;</div>
+
+    <div class="footer__credit">
+      <p>Site desenvolvido por <strong>JP Marketing Digital e Tráfego Pago</strong></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background-color: var(--color-bg-base);
+    border-top: 1px solid var(--color-hairline);
+    /* Sem padding embaixo: o respiro final é o padding-block do crédito */
+    padding: 4.5rem 0 0;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
+  }
+
+  .footer__logo {
+    width: 170px;
+    height: auto;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer__brand .footer__text {
+    max-width: 16rem;
+  }
+
+  .footer__title {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gold-primary);
+    margin-bottom: 0.75rem;
+  }
+  .footer__title--spaced {
+    margin-top: 1.5rem;
+  }
+
+  .footer__text {
+    color: var(--color-text-body);
+    font-size: 0.9rem;
+    font-style: normal;
+    line-height: 1.7;
+  }
+
+  .footer a {
+    color: var(--color-text-body);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .footer a:hover {
+    color: var(--color-gold-bright);
+  }
+
+  .footer__socials {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  .footer__divider {
+    margin: 1.75rem 0 0;
+  }
+
+  /* Copyright e política nos extremos opostos, na mesma linha de base */
+  .footer__legal {
+    margin-top: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    color: var(--color-text-body);
+  }
+
+  .footer__credit {
+    padding-block: 12px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--color-text-body);
+  }
+  .footer__credit strong {
+    color: var(--color-gold-primary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 900px) {
+    .footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+  @media (max-width: 560px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+    .footer__legal {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+  }
+</style>

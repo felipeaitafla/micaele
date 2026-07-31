@@ -1,0 +1,116 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import { sanityFetch, whatsappUrl } from '../lib/sanity';
+import { home, settings } from '../lib/content';
+
+const data = await sanityFetch<any>(
+  `*[_type == "homePage"][0]{
+    specialServicesTitle, specialServicesSubtitle, specialServicesDescription,
+    specialServices, specialServicesDisclaimer
+  }`
+);
+const cfg = await sanityFetch<any>(
+  `*[_type == "siteSettings"][0]{ companyName, phone }`
+);
+
+const title = data?.specialServicesTitle ?? home.specialServicesTitle;
+const subtitle = data?.specialServicesSubtitle ?? home.specialServicesSubtitle;
+const description = data?.specialServicesDescription ?? home.specialServicesDescription;
+const items = data?.specialServices?.length ? data.specialServices : home.specialServices;
+const disclaimer = data?.specialServicesDisclaimer ?? home.specialServicesDisclaimer;
+
+const companyName = cfg?.companyName ?? settings.companyName;
+const phone = cfg?.phone ?? settings.phone;
+---
+
+<section class="special section-padding" id="especiais">
+  <div class="container">
+    <SectionHeader title={title} subtitle={subtitle} description={description} />
+
+    <ul class="special__list">
+      {items.map((item: any) => (
+        <li class="special__item">
+          <div class="special__text">
+            <h3 class="special__name">{item.name}</h3>
+            {item.description && <p class="special__desc">{item.description}</p>}
+          </div>
+          <a
+            href={whatsappUrl(phone, companyName, item.name)}
+            class="btn btn--outline special__cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Fale conosco
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {disclaimer && (
+      <p class="special__disclaimer">{disclaimer}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .special {
+    background-color: var(--color-bg-surface);
+    border-block: 1px solid var(--color-hairline);
+  }
+
+  .special__list {
+    list-style: none;
+    max-width: 52rem;
+    margin: 0 auto;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .special__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .special__name {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.4rem;
+    color: var(--color-text-heading);
+    margin-bottom: 0.35rem;
+  }
+
+  .special__desc {
+    color: var(--color-text-body);
+    font-size: 0.95rem;
+  }
+
+  .special__cta {
+    flex-shrink: 0;
+  }
+
+  /* Aviso: presente e legível, mas sem competir com o conteúdo */
+  .special__disclaimer {
+    max-width: 52rem;
+    margin: 2.5rem auto 0;
+    padding: 1.25rem 1.5rem;
+    border-left: 2px solid var(--color-gold-deep);
+    background-color: rgba(0, 0, 0, 0.25);
+    color: var(--color-text-body);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 640px) {
+    .special__item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .special__cta {
+      width: 100%;
+    }
+  }
+</style>

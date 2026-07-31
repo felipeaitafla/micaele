@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap');
+
+:root {
+  /* Backgrounds */
+  --color-bg-base: #14120F;
+  --color-bg-surface: #221D18;
+
+  /* Text */
+  --color-text-heading: #F5F0E6;
+  --color-text-body: #C9C1B3;
+
+  /* Gold */
+  --color-gold-primary: #C7A344;
+  --color-gold-bright: #E8CE7D;
+  --color-gold-deep: #8A6A26;
+  --color-hairline: rgba(199, 163, 68, 0.18);
+  --color-glow: rgba(199, 163, 68, 0.12);
+
+  /* Typography */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Work Sans', sans-serif;
+}
+
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-body);
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  /* Essencial: <Image> do Astro emite width/height como atributos. Sem isto a
+     altura fica travada no valor original e qualquer aspect-ratio é ignorado. */
+  height: auto;
+}
+
+/* Foco visível em todo elemento interativo */
+:focus-visible {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-heading);
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 2rem;
+}
+
+h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+/* Text styles */
+.lead-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--color-gold-primary);
+}
+
+.label-text {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn--primary {
+  background-color: var(--color-gold-primary);
+  color: var(--color-bg-base);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-gold-bright);
+  transform: translateY(-2px);
+}
+
+.btn--outline {
+  background-color: transparent;
+  color: var(--color-gold-primary);
+  border: 1px solid var(--color-gold-primary);
+}
+
+.btn--outline:hover {
+  background-color: var(--color-gold-primary);
+  color: var(--color-bg-base);
+}
+
+/* Global Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section-padding {
+  padding: 6rem 0;
+}
+
+/* Ornamentation */
+.ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: var(--color-gold-primary);
+  margin: 4rem 0;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: "";
+  flex-grow: 1;
+  max-width: 120px;
+  height: 1px;
+  background-color: var(--color-hairline);
+}
+
+.framed-image {
+  position: relative;
+  padding: 8px;
+  border: 1px solid var(--color-hairline);
+}
+.framed-image::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--color-gold-primary);
+  pointer-events: none;
+}
+.framed-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.framed-image--glow {
+  box-shadow: 0 0 80px 20px var(--color-glow);
+}
+
+/* Grade de cards de serviço/procedimento.
+   Flex em vez de grid para que a última linha incompleta fique centralizada. */
+.service-grid {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.service-grid > * {
+  flex: 0 1 calc((100% - 3rem) / 3);
+  min-width: 15rem;
+}
+
+@media (max-width: 900px) {
+  .service-grid > * {
+    flex-basis: calc((100% - 1.5rem) / 2);
+  }
+}
+@media (max-width: 560px) {
+  .service-grid > * {
+    flex-basis: 100%;
+  }
+}
+
+.surface-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: 4px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5), 0 0 40px var(--color-glow);
+}

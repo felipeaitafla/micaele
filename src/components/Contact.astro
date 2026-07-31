@@ -1,0 +1,212 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeader from './SectionHeader.astro';
+import fachada from '../assets/empresa/fachada.jpg';
+import { sanityFetch, urlFor } from '../lib/sanity';
+import { home, settings } from '../lib/content';
+
+const data = await sanityFetch<any>(
+  `*[_type == "homePage"][0]{ contactTitle, contactDescription, contactImage }`
+);
+const cfg = await sanityFetch<any>(
+  `*[_type == "siteSettings"][0]{ companyName, phone }`
+);
+
+const title = data?.contactTitle ?? home.contactTitle;
+const description = data?.contactDescription ?? home.contactDescription;
+const companyName = cfg?.companyName ?? settings.companyName;
+const phone = cfg?.phone ?? settings.phone;
+
+const photo = urlFor(data?.contactImage)?.width(900).url();
+---
+
+<section class="contact" id="contato">
+  <div class="contact__bg" aria-hidden="true">
+    {photo ? (
+      <img src={photo} alt="" loading="lazy" />
+    ) : (
+      <Image src={fachada} alt="" widths={[900, 1600]} sizes="100vw" loading="lazy" />
+    )}
+  </div>
+  <div class="contact__veil" aria-hidden="true"></div>
+
+  <div class="container contact__inner">
+    <div class="contact__form-wrap surface-card">
+      <SectionHeader title={title} description={description} />
+
+      <!--
+        TODO (definir antes de publicar): integração de envio.
+        Enquanto nenhum serviço de formulário estático estiver contratado, o
+        envio monta a mensagem e abre o WhatsApp — assim nenhum contato se perde.
+        Para trocar por Web3Forms/Formspree, basta dar um `action` ao <form>
+        e remover o listener em `contact-form.ts`.
+      -->
+      <form class="contact__form" id="contact-form" data-phone={phone} data-company={companyName}>
+        <div class="contact__row">
+          <div class="field">
+            <label for="contact-name">Nome completo</label>
+            <input type="text" id="contact-name" name="name" required autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="contact-phone">WhatsApp</label>
+            <input type="tel" id="contact-phone" name="phone" required autocomplete="tel" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="contact-email">E-mail</label>
+          <input type="email" id="contact-email" name="email" autocomplete="email" />
+        </div>
+
+        <div class="field">
+          <label for="contact-message">Mensagem</label>
+          <textarea id="contact-message" name="message" rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn--primary contact__submit">Enviar mensagem</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    /* 96px entre a borda da seção e o card do formulário */
+    padding: 96px 0;
+  }
+
+  /* Foto da fachada como fundo da seção */
+  .contact__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .contact__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Mesmo tratamento do hero: a foto vira atmosfera, não assunto */
+    filter: saturate(0.3) sepia(0.35) brightness(0.45) contrast(1.05);
+  }
+
+  /* Overlay escuro: mantém o contraste do formulário sobre a foto */
+  .contact__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 60% 60% at 50% 45%, rgba(199, 163, 68, 0.12), transparent 70%),
+      rgba(20, 18, 15, 0.82);
+  }
+
+  .contact__inner {
+    display: flex;
+    justify-content: center;
+  }
+
+  .contact__form-wrap {
+    width: 100%;
+    max-width: 44rem;
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+  /* O cabeçalho dentro do card não precisa da margem cheia de seção */
+  .contact__form-wrap :global(.section-header) {
+    margin-bottom: 2rem;
+  }
+
+  .contact__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .field label {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gold-primary);
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    background-color: var(--color-bg-base);
+    border: 1px solid var(--color-hairline);
+    border-radius: 3px;
+    color: var(--color-text-heading);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 6rem;
+  }
+  .field input:hover,
+  .field textarea:hover {
+    border-color: rgba(199, 163, 68, 0.4);
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 0 3px rgba(199, 163, 68, 0.15);
+  }
+
+  .contact__submit {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 520px) {
+    .contact__row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const name = String(data.get('name') || '').trim();
+    const phone = String(data.get('phone') || '').trim();
+    const email = String(data.get('email') || '').trim();
+    const message = String(data.get('message') || '').trim();
+
+    const company = form.dataset.company || '';
+    const target = form.dataset.phone || '';
+
+    const lines = [
+      `Olá, ${company}! Gostaria de mais informações.`,
+      '',
+      `Nome: ${name}`,
+      `WhatsApp: ${phone}`,
+    ];
+    if (email) lines.push(`E-mail: ${email}`);
+    if (message) lines.push('', message);
+
+    window.open(
+      `https://wa.me/${target}?text=${encodeURIComponent(lines.join('\n'))}`,
+      '_blank',
+      'noopener'
+    );
+  });
+</script>

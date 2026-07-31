@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeader from './SectionHeader.astro';
+import { sanityFetch, urlFor } from '../lib/sanity';
+import { home } from '../lib/content';
+
+const localPhotos = Object.values(
+  import.meta.glob<ImageMetadata>('../assets/empresa/*.jpg', {
+    eager: true,
+    import: 'default',
+  })
+);
+
+const data = await sanityFetch<any>(
+  `*[_type == "homePage"][0]{ spaceTitle, spaceImages }`
+);
+
+const title = data?.spaceTitle ?? home.spaceTitle;
+const sanityPhotos: string[] =
+  data?.spaceImages?.map((img: any) => urlFor(img)?.width(900).height(1100).fit('crop').url()).filter(Boolean) ?? [];
+const usingSanity = sanityPhotos.length > 0;
+const photos: any[] = usingSanity ? sanityPhotos : localPhotos;
+---
+
+<section class="space section-padding" id="espaco">
+  <div class="container">
+    <SectionHeader title={title} description={home.spaceDescription} />
+
+    <ul class="space__grid">
+      {photos.map((photo) => (
+        <li class="space__item">
+          {usingSanity ? (
+            <img src={photo} alt="Ambiente da Micaele Spa Estética" loading="lazy" decoding="async" />
+          ) : (
+            <Image
+              src={photo}
+              alt="Ambiente da Micaele Spa Estética"
+              widths={[400, 700]}
+              sizes="(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw"
+              loading="lazy"
+            />
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* 6 fotos em 2 linhas de 3 */
+  .space__grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 860px) {
+    .space__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 540px) {
+    .space__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Moldura dupla do design system */
+  .space__item {
+    position: relative;
+    padding: 6px;
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    background-color: var(--color-bg-surface);
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .space__item:hover {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 40px var(--color-glow);
+  }
+
+  .space__item :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+    border-radius: 2px;
+    /* O ambiente é iluminado por LED azul/roxo. Dessaturar e aquecer traz as
+       fotos para a paleta dourada sem descaracterizar o espaço. */
+    filter: saturate(0.28) sepia(0.42) brightness(0.9) contrast(1.05);
+    transition: filter 0.6s ease, transform 0.8s ease;
+  }
+  /* No hover a foto volta a cor quase real, para o visitante ver o ambiente */
+  .space__item:hover :global(img) {
+    filter: saturate(0.75) sepia(0.1) brightness(1);
+    transform: scale(1.03);
+  }
+</style>

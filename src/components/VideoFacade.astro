@@ -1,0 +1,114 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+  ratio?: string;
+}
+const { videoId, title = 'Reproduzir vídeo', ratio = '9/16' } = Astro.props;
+---
+
+<button
+  type="button"
+  class="video"
+  data-video-id={videoId}
+  data-ratio={ratio}
+  style={`--ratio:${ratio}`}
+  aria-label={`Reproduzir: ${title}`}
+>
+  <img
+    src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+    alt=""
+    loading="lazy"
+    decoding="async"
+    class="video__thumb"
+  />
+  <span class="video__play" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+  </span>
+</button>
+
+<style>
+  .video {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--ratio, 9/16);
+    padding: 0;
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--color-bg-surface);
+    cursor: pointer;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .video:hover {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 40px var(--color-glow);
+  }
+
+  .video__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease, opacity 0.4s ease;
+    opacity: 0.85;
+  }
+  .video:hover .video__thumb {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+
+  .video__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-gold-primary);
+    border-radius: 50%;
+    background-color: rgba(20, 18, 15, 0.55);
+    color: var(--color-gold-primary);
+    backdrop-filter: blur(2px);
+    transition: background-color 0.4s ease, color 0.4s ease, scale 0.4s ease;
+  }
+  .video:hover .video__play {
+    background-color: var(--color-gold-primary);
+    color: var(--color-bg-base);
+    scale: 1.06;
+  }
+  .video__play svg {
+    width: 26px;
+    height: 26px;
+    margin-left: 3px;
+  }
+</style>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest<HTMLButtonElement>('.video[data-video-id]');
+    if (!btn) return;
+
+    const id = btn.dataset.videoId;
+    const ratio = btn.dataset.ratio || '9/16';
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:relative;width:100%;aspect-ratio:${ratio};overflow:hidden;border-radius:4px;background:#000;border:1px solid var(--color-gold-primary);`;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    iframe.title = btn.getAttribute('aria-label') || 'Vídeo';
+    iframe.setAttribute(
+      'allow',
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+    );
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.style.cssText =
+      'position:absolute;inset:0;width:100%;height:100%;border:0;display:block;';
+
+    wrap.appendChild(iframe);
+    btn.parentNode?.replaceChild(wrap, btn);
+  });
+</script>

@@ -1,0 +1,135 @@
+---
+import { Image } from 'astro:assets';
+import SectionHeader from './SectionHeader.astro';
+import VideoFacade from './VideoFacade.astro';
+import { sanityFetch, urlFor } from '../lib/sanity';
+import { home } from '../lib/content';
+
+const localPhotos = Object.values(
+  import.meta.glob<ImageMetadata>('../assets/portfolio/*.jpg', {
+    eager: true,
+    import: 'default',
+  })
+);
+
+const data = await sanityFetch<any>(
+  `*[_type == "homePage"][0]{ portfolioTitle, portfolioImages, portfolioVideos }`
+);
+
+const title = data?.portfolioTitle ?? home.portfolioTitle;
+const videos = data?.portfolioVideos?.length ? data.portfolioVideos : home.portfolioVideos;
+
+const sanityPhotos: string[] =
+  data?.portfolioImages?.map((img: any) => urlFor(img)?.width(700).height(700).fit('crop').url()).filter(Boolean) ?? [];
+
+// O carrossel precisa da lista duplicada para o loop não ter emenda visível.
+const usingSanity = sanityPhotos.length > 0;
+const track = usingSanity ? [...sanityPhotos, ...sanityPhotos] : [...localPhotos, ...localPhotos];
+---
+
+<section class="portfolio section-padding" id="portfolio">
+  <div class="container">
+    <SectionHeader title={title} description={home.portfolioDescription} />
+  </div>
+
+  <!-- Carrossel infinito: puro CSS, pausa no hover e no foco do teclado -->
+  <div class="marquee" role="region" aria-label="Galeria de fotos">
+    <ul class="marquee__track">
+      {track.map((photo: any, i: number) => (
+        <li class="marquee__item" aria-hidden={i >= track.length / 2 ? 'true' : undefined}>
+          {usingSanity ? (
+            <img src={photo} alt="" loading="lazy" decoding="async" />
+          ) : (
+            <Image src={photo} alt="" widths={[320, 480]} loading="lazy" />
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="container">
+    <ul class="portfolio__videos">
+      {videos.map((video: any) => (
+        <li>
+          <VideoFacade videoId={video.youtubeId} title={video.title} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 0.5rem 0;
+    /* Esmaece as bordas para o loop não "cortar" bruscamente */
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee__track {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+    animation: marquee-scroll 60s linear infinite;
+  }
+  .marquee:hover .marquee__track,
+  .marquee:focus-within .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .marquee__item {
+    width: clamp(190px, 22vw, 280px);
+    flex-shrink: 0;
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--color-bg-surface);
+  }
+  .marquee__item :global(img) {
+    width: 100%;
+    /* 3/4 = 33% mais alto que o quadrado anterior, mantendo a mesma largura */
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .marquee__track {
+      animation: none;
+    }
+  }
+
+  .portfolio__videos {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 60rem;
+    margin: 3.5rem auto 0;
+  }
+
+  @media (max-width: 760px) {
+    .portfolio__videos {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 460px) {
+    .portfolio__videos {
+      grid-template-columns: 1fr;
+      max-width: 20rem;
+    }
+  }
+</style>

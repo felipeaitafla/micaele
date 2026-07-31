@@ -1,11 +1,37 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Hero from '../components/Hero.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Services from '../components/Services.astro';
+import SpecialServices from '../components/SpecialServices.astro';
+import Procedures from '../components/Procedures.astro';
+import Portfolio from '../components/Portfolio.astro';
+import About from '../components/About.astro';
+import Space from '../components/Space.astro';
+import Contact from '../components/Contact.astro';
+import Location from '../components/Location.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+	title="Micaele Spa Estética | Clínica de Estética e SPA de Massagem em Goiânia-GO"
+	description="Clínica de Estética e SPA de Massagem em Goiânia-GO. Massagem relaxante, terapêutica, muscular, pedras quentes, drenagem linfática e procedimentos estéticos."
+>
+	<main>
+		<Hero />
+		<Testimonials />
+		<Services />
+		<SpecialServices />
+		<Procedures />
+		<Portfolio />
+		<About />
+		<Space />
+		<Contact />
+		<Location />
+	</main>
 </Layout>
+
+<style>
+	main {
+		width: 100%;
+	}
+</style>

@@ -1,0 +1,53 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import ServiceCard from './ServiceCard.astro';
+import { sanityFetch, urlFor } from '../lib/sanity';
+import { home, settings } from '../lib/content';
+
+const data = await sanityFetch<any>(
+  `*[_type == "homePage"][0]{ servicesTitle, servicesDescription, services }`
+);
+const cfg = await sanityFetch<any>(
+  `*[_type == "siteSettings"][0]{ companyName, phone }`
+);
+
+const title = data?.servicesTitle ?? home.servicesTitle;
+const description = data?.servicesDescription ?? home.servicesDescription;
+const services = data?.services?.length ? data.services : home.services;
+
+const companyName = cfg?.companyName ?? settings.companyName;
+const phone = cfg?.phone ?? settings.phone;
+
+// Fotos locais indexadas por slug: src/assets/servicos/<slug>.jpg
+const files = import.meta.glob<ImageMetadata>('../assets/servicos/*.jpg', {
+  eager: true,
+  import: 'default',
+});
+const bySlug = Object.fromEntries(
+  Object.entries(files).map(([p, img]) => [p.split('/').pop()!.replace('.jpg', ''), img])
+);
+---
+
+<section class="services section-padding" id="servicos">
+  <div class="container">
+    <SectionHeader title={title} description={description} />
+
+    <ul class="service-grid">
+      {services.map((service: any) => (
+        <ServiceCard
+          name={service.name}
+          image={urlFor(service.image)?.width(800).height(600).fit('crop').url() ?? null}
+          imageFile={bySlug[service.slug] ?? null}
+          phone={phone}
+          companyName={companyName}
+        />
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .services {
+    background-color: var(--color-bg-base);
+  }
+</style>
