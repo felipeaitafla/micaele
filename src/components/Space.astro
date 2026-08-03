@@ -47,6 +47,11 @@ const photos: any[] = usingSanity ? sanityPhotos : localPhotos;
 </section>
 
 <style>
+  /* Caixa mais estreita para as linhas da descrição ficarem equilibradas */
+  .space :global(.section-header__desc) {
+    max-width: 28rem;
+  }
+
   /* 6 fotos em 2 linhas de 3 */
   .space__grid {
     list-style: none;

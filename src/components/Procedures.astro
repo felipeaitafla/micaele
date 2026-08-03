@@ -30,7 +30,7 @@ const bySlug = Object.fromEntries(
 
 <section class="procedures section-padding" id="procedimentos">
   <div class="container">
-    <SectionHeader title={title} description={description} />
+    <SectionHeader title={title} description={description} split />
 
     <ul class="service-grid">
       {procedures.map((item: any) => (
@@ -45,3 +45,9 @@ const bySlug = Object.fromEntries(
     </ul>
   </div>
 </section>
+
+<style>
+  .procedures :global(.service-grid) {
+    justify-content: flex-start;
+  }
+</style>

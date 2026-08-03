@@ -1,24 +1,20 @@
 ---
 import SectionHeader from './SectionHeader.astro';
 import { sanityFetch } from '../lib/sanity';
-import { home, settings } from '../lib/content';
+import { home } from '../lib/content';
 
 const data = await sanityFetch<any>(
   `*[_type == "homePage"][0]{ locationTitle, locationText, mapEmbedUrl }`
 );
-const cfg = await sanityFetch<any>(`*[_type == "siteSettings"][0]{ address }`);
 
 const title = data?.locationTitle ?? home.locationTitle;
 const text = data?.locationText ?? home.locationText;
 const mapUrl = data?.mapEmbedUrl ?? home.mapEmbedUrl;
-const address = cfg?.address ?? settings.address;
 ---
 
 <section class="location section-padding" id="localizacao">
   <div class="container">
     <SectionHeader title={title} description={text} />
-
-    <p class="location__address">{address}</p>
 
     <div class="location__map">
       <iframe
@@ -36,14 +32,6 @@ const address = cfg?.address ?? settings.address;
   .location {
     background-color: var(--color-bg-surface);
     border-top: 1px solid var(--color-hairline);
-  }
-
-  .location__address {
-    text-align: center;
-    color: var(--color-gold-bright);
-    font-size: 0.95rem;
-    max-width: 34rem;
-    margin: -2rem auto 2.5rem;
   }
 
   .location__map {

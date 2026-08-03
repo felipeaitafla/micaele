@@ -4,21 +4,40 @@ interface Props {
   subtitle?: string;
   description?: string;
   align?: 'center' | 'left';
+  split?: boolean;
+  equalColumns?: boolean;
 }
-const { title, subtitle, description, align = 'center' } = Astro.props;
+const { title, subtitle, description, align = 'center', split = false, equalColumns = false } = Astro.props;
 ---
 
-<header class:list={['section-header', align === 'left' && 'section-header--left']}>
-  <div class="section-header__ornament" aria-hidden="true">
-    <span class="section-header__rule"></span>
-    <span class="section-header__diamond">&#9670;</span>
-    <span class="section-header__rule"></span>
-  </div>
+{split ? (
+  <header class:list={['section-header', 'section-header--split', equalColumns && 'section-header--equal']}>
+    <div class="section-header__col section-header__col--title">
+      <div class="section-header__ornament" aria-hidden="true">
+        <span class="section-header__rule"></span>
+        <span class="section-header__diamond">&#9670;</span>
+      </div>
+      <h2 class="section-header__title">{title}</h2>
+      {subtitle && <p class="section-header__subtitle">{subtitle}</p>}
+    </div>
 
-  <h2 class="section-header__title">{title}</h2>
-  {subtitle && <p class="section-header__subtitle">{subtitle}</p>}
-  {description && <p class="section-header__desc">{description}</p>}
-</header>
+    <div class="section-header__col section-header__col--desc">
+      {description && <p class="section-header__desc">{description}</p>}
+    </div>
+  </header>
+) : (
+  <header class:list={['section-header', align === 'left' && 'section-header--left']}>
+    <div class="section-header__ornament" aria-hidden="true">
+      <span class="section-header__rule"></span>
+      <span class="section-header__diamond">&#9670;</span>
+      <span class="section-header__rule"></span>
+    </div>
+
+    <h2 class="section-header__title">{title}</h2>
+    {subtitle && <p class="section-header__subtitle">{subtitle}</p>}
+    {description && <p class="section-header__desc">{description}</p>}
+  </header>
+)}
 
 <style>
   .section-header {
@@ -67,6 +86,76 @@ const { title, subtitle, description, align = 'center' } = Astro.props;
     color: var(--color-text-body);
     max-width: 46rem;
     margin: 0 auto;
+  }
+
+  /* Variante split: título e descrição em colunas lado a lado */
+  .section-header--split {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: none;
+    text-align: left;
+    margin: 0 auto 3.5rem;
+  }
+  .section-header--split .section-header__ornament {
+    justify-content: flex-start;
+    margin-bottom: 1.25rem;
+  }
+  .section-header--split .section-header__rule {
+    width: 40px;
+    background: var(--color-gold-primary);
+  }
+  .section-header--split .section-header__title {
+    font-size: 40px;
+    margin-bottom: 0;
+    text-transform: capitalize;
+  }
+  .section-header--split .section-header__col--title {
+    flex: 0 0 auto;
+    max-width: 34rem;
+  }
+  .section-header--split .section-header__col--desc {
+    flex: 1;
+    max-width: 34rem;
+  }
+  .section-header--split .section-header__subtitle {
+    font-size: 24px;
+    line-height: 1.1;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+  .section-header--split .section-header__desc {
+    max-width: none;
+    margin: 0;
+    font-size: 15px;
+    text-align: justify;
+  }
+
+  /* Variante split com colunas de largura igual (1fr 1fr) */
+  .section-header--split.section-header--equal .section-header__col--title,
+  .section-header--split.section-header--equal .section-header__col--desc {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+
+  @media (max-width: 720px) {
+    .section-header--split {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .section-header--split .section-header__col--title,
+    .section-header--split .section-header__col--desc {
+      max-width: none;
+    }
+  }
+
+  /* Descrições justificadas no mobile, mesmo quando centralizadas no desktop */
+  @media (max-width: 640px) {
+    .section-header__desc {
+      text-align: justify;
+    }
   }
 
   /* Variante alinhada à esquerda */

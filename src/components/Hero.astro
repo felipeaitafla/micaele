@@ -10,7 +10,7 @@ const data = await sanityFetch<any>(
   `*[_type == "homePage"][0]{ heroTitle, heroDescription, heroLocation, heroImage, heroBackgroundImage }`
 );
 const cfg = await sanityFetch<any>(
-  `*[_type == "siteSettings"][0]{ companyName, phone, phoneDisplay }`
+  `*[_type == "siteSettings"][0]{ companyName, phone, phoneDisplay, googleReviewsUrl }`
 );
 
 const title = data?.heroTitle ?? home.heroTitle;
@@ -20,6 +20,7 @@ const location = data?.heroLocation ?? home.heroLocation;
 const companyName = cfg?.companyName ?? settings.companyName;
 const phone = cfg?.phone ?? settings.phone;
 const phoneDisplay = cfg?.phoneDisplay ?? settings.phoneDisplay;
+const googleUrl = cfg?.googleReviewsUrl ?? settings.googleReviewsUrl;
 
 const waUrl = whatsappUrl(phone, companyName);
 const telUrl = `tel:+${phone}`;
@@ -46,10 +47,15 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
       <p class="hero__desc">{description}</p>
 
       {location && (
-        <p class="hero__location">
+        <a
+          href={googleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hero__location"
+        >
           <span class="hero__diamond" aria-hidden="true">&#9670;</span>
           {location}
-        </p>
+        </a>
       )}
 
       <div class="hero__actions">
@@ -131,7 +137,7 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
   /* Texto e imagem com metade da largura cada, ocupando a altura fixa da seção */
   .hero__inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: calc(50% - 40px) calc(50% + 40px);
     align-items: stretch;
     gap: 2rem;
     height: 100%;
@@ -146,7 +152,7 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
   }
 
   .hero__logo {
-    width: clamp(170px, 17vw, 230px);
+    width: clamp(170px, 17vw, 210px);
     height: auto;
     margin-bottom: 1.75rem;
   }
@@ -155,15 +161,16 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     /* 36px no desktop; encolhe em telas estreitas para não quebrar o layout */
     font-size: clamp(1.5rem, 2.8vw, 36px);
     line-height: 1.2;
-    letter-spacing: 0.01em;
+    letter-spacing: -0.01em;
     margin-bottom: 1.25rem;
-    text-wrap: balance;
+    text-align: justify;
   }
 
   .hero__desc {
     font-size: 15px;
     color: var(--color-text-body);
     margin-bottom: 1.5rem;
+    text-align: justify;
   }
 
   .hero__location {
@@ -174,6 +181,11 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     font-size: 0.9375rem;
     color: var(--color-gold-bright);
     margin-bottom: 1.75rem;
+    text-decoration: none;
+    width: fit-content;
+  }
+  .hero__location:hover {
+    text-decoration: underline;
   }
   .hero__diamond {
     color: var(--color-gold-primary);
@@ -228,14 +240,11 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
 
   .hero__owners {
     width: 100%;
-    max-width: 32rem;
     height: auto;
     display: block;
     /* Sem drop-shadow: como a figura quase preenche o retângulo da foto, o
        blur do shadow acompanhava esse contorno reto e virava uma "caixa"
        escura atrás deles. A elevação já vem do glow dourado, não de sombra. */
-    mask-image: linear-gradient(to bottom, #000 85%, transparent 99%);
-    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 99%);
   }
 
   /* --- Entrada suave, no ritmo do design system --- */
@@ -275,7 +284,6 @@ const bgSrc = urlFor(data?.heroBackgroundImage)?.width(1800).url();
     .hero__location { justify-content: center; }
     .hero__actions { justify-content: center; }
     .hero__figure { order: 2; }
-    .hero__owners { max-width: 22rem; }
   }
 
   @media (max-width: 480px) {

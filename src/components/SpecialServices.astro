@@ -25,7 +25,7 @@ const phone = cfg?.phone ?? settings.phone;
 
 <section class="special section-padding" id="especiais">
   <div class="container">
-    <SectionHeader title={title} subtitle={subtitle} description={description} />
+    <SectionHeader title={title} subtitle={subtitle} description={description} split equalColumns />
 
     <ul class="special__list">
       {items.map((item: any) => (
@@ -56,6 +56,12 @@ const phone = cfg?.phone ?? settings.phone;
   .special {
     background-color: var(--color-bg-surface);
     border-block: 1px solid var(--color-hairline);
+  }
+
+  /* Título + descrição com a mesma largura da lista abaixo */
+  .special :global(.section-header--split) {
+    max-width: 52rem;
+    margin-inline: auto;
   }
 
   .special__list {
@@ -111,6 +117,9 @@ const phone = cfg?.phone ?? settings.phone;
     }
     .special__cta {
       width: 100%;
+    }
+    .special__desc {
+      text-align: justify;
     }
   }
 </style>

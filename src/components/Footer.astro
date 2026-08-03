@@ -24,7 +24,9 @@ const socials = [
     <div class="footer__grid">
       <div class="footer__col footer__brand">
         <Image src={logo} alt={s.companyName} class="footer__logo" widths={[200, 400]} loading="lazy" />
-        <address class="footer__text">{s.address}</address>
+        <address class="footer__text">
+          <a href={s.googleReviewsUrl} target="_blank" rel="noopener noreferrer">{s.address}</a>
+        </address>
       </div>
 
       <div class="footer__col">
@@ -79,14 +81,14 @@ const socials = [
     </div>
 
     <div class="footer__legal">
-      <p>&copy; {year} — Direitos reservados{s.cnpj && ` — CNPJ ${s.cnpj}`}</p>
-      <p><a href="/politica-de-privacidade">Política de Privacidade</a></p>
+      <p class="footer__copyright">&copy; {year} — Direitos reservados{s.cnpj && ` — CNPJ ${s.cnpj}`}</p>
+      <p class="footer__privacy"><a href="/politica-de-privacidade">Política de Privacidade</a></p>
     </div>
 
     <div class="ornament-divider footer__divider" aria-hidden="true">&#9670;</div>
 
     <div class="footer__credit">
-      <p>Site desenvolvido por <strong>JP Marketing Digital e Tráfego Pago</strong></p>
+      <p>Site desenvolvido por <a href="https://www.jpmidiadigitaleimpressa.com.br/" target="_blank" rel="noopener noreferrer"><strong>JP Marketing Digital e Tráfego Pago</strong></a></p>
     </div>
   </div>
 </footer>
@@ -171,16 +173,22 @@ const socials = [
     margin: 1.75rem 0 0;
   }
 
-  /* Copyright e política nos extremos opostos, na mesma linha de base */
+  /* Copyright e política na mesma linha de base; política alinhada com a
+     coluna "Redes sociais" acima, usando a mesma grade de 4 colunas */
   .footer__legal {
     margin-top: 3rem;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     align-items: baseline;
-    justify-content: space-between;
     gap: 0.75rem;
     font-size: 0.82rem;
     color: var(--color-text-body);
+  }
+  .footer__copyright {
+    grid-column: 1 / 4;
+  }
+  .footer__privacy {
+    grid-column: 4;
   }
 
   .footer__credit {
@@ -193,11 +201,24 @@ const socials = [
     color: var(--color-gold-primary);
     font-weight: 500;
   }
+  .footer__credit a {
+    text-decoration: none;
+  }
+  .footer__credit a:hover strong {
+    text-decoration: underline;
+  }
 
   @media (max-width: 900px) {
     .footer__grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 2rem;
+    }
+    .footer__legal {
+      grid-template-columns: 1fr;
+    }
+    .footer__copyright,
+    .footer__privacy {
+      grid-column: 1;
     }
   }
   @media (max-width: 560px) {
@@ -205,9 +226,8 @@ const socials = [
       grid-template-columns: 1fr;
     }
     .footer__legal {
-      flex-direction: column;
       text-align: center;
-      align-items: center;
+      justify-items: center;
     }
   }
 </style>
