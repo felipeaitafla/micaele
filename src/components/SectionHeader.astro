@@ -100,6 +100,7 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     margin: 0 auto 3.5rem;
   }
   .section-header--split .section-header__ornament {
+    justify-content: flex-start;
     margin-bottom: 1.25rem;
   }
   .section-header--split .section-header__title {
@@ -110,7 +111,6 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
   .section-header--split .section-header__col--title {
     flex: 0 0 auto;
     max-width: 34rem;
-    text-align: center;
   }
   .section-header--split .section-header__col--desc {
     flex: 1;
@@ -145,6 +145,12 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     .section-header--split .section-header__col--title,
     .section-header--split .section-header__col--desc {
       max-width: none;
+    }
+    .section-header--split .section-header__col--title {
+      text-align: center;
+    }
+    .section-header--split .section-header__ornament {
+      justify-content: center;
     }
   }
 
