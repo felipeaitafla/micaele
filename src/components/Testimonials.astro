@@ -61,6 +61,11 @@ const toneFor = (name = '') =>
 </section>
 
 <style>
+  /* Caixa mais estreita para a frase curta quebrar em linhas equilibradas */
+  .reviews :global(.section-header__desc) {
+    max-width: 20rem;
+  }
+
   .reviews__list {
     list-style: none;
     display: grid;

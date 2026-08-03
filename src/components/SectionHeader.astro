@@ -86,6 +86,7 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     color: var(--color-text-body);
     max-width: 46rem;
     margin: 0 auto;
+    text-align: justify;
   }
 
   /* Variante split: título e descrição em colunas lado a lado */
@@ -148,13 +149,6 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     .section-header--split .section-header__col--title,
     .section-header--split .section-header__col--desc {
       max-width: none;
-    }
-  }
-
-  /* Descrições justificadas no mobile, mesmo quando centralizadas no desktop */
-  @media (max-width: 640px) {
-    .section-header__desc {
-      text-align: justify;
     }
   }
 
