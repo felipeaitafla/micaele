@@ -61,9 +61,16 @@ const toneFor = (name = '') =>
 </section>
 
 <style>
-  /* Caixa mais estreita para a frase curta quebrar em linhas equilibradas */
+  /* Desktop: frase curta em uma linha só */
   .reviews :global(.section-header__desc) {
-    max-width: 20rem;
+    max-width: none;
+  }
+
+  /* Mobile: caixa mais estreita pra quebrar em duas linhas equilibradas */
+  @media (max-width: 640px) {
+    .reviews :global(.section-header__desc) {
+      max-width: 14rem;
+    }
   }
 
   .reviews__list {
