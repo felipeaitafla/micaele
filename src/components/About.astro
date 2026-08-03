@@ -82,6 +82,12 @@ const hasRichText = Array.isArray(data?.aboutText) && data.aboutText.length > 0;
     border-block: 1px solid var(--color-hairline);
   }
 
+  /* Sem descrição dentro do cabeçalho aqui: o espaçamento padrão de 3.5rem
+     do SectionHeader fica grande demais só com o título */
+  .about__content :global(.section-header) {
+    margin-bottom: 0.75rem;
+  }
+
   .about__inner {
     display: grid;
     grid-template-columns: 0.85fr 1.15fr;
