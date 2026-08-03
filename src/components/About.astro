@@ -201,21 +201,13 @@ const hasRichText = Array.isArray(data?.aboutText) && data.aboutText.length > 0;
       max-width: 18rem;
     }
 
-    /* Título centralizado com o ornamento duplo (igual às seções centralizadas) */
+    /* Título e ornamento centralizados no mobile */
     .about :global(.section-header--left) {
       text-align: center;
       margin-inline: auto;
     }
     .about :global(.section-header--left .section-header__ornament) {
       justify-content: center;
-    }
-    .about :global(.section-header--left .section-header__rule) {
-      width: 60px;
-      background: linear-gradient(90deg, transparent, var(--color-gold-primary));
-    }
-    .about :global(.section-header--left .section-header__rule:last-child) {
-      display: block;
-      background: linear-gradient(90deg, var(--color-gold-primary), transparent);
     }
 
     .about__content > .btn {

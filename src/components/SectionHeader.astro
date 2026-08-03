@@ -154,20 +154,13 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     }
   }
 
-  /* Variante alinhada à esquerda */
+  /* Variante alinhada à esquerda: mesmo ornamento duplo, só que à esquerda */
   .section-header--left {
     text-align: left;
     margin-inline: 0;
   }
   .section-header--left .section-header__ornament {
     justify-content: flex-start;
-  }
-  .section-header--left .section-header__rule:first-child {
-    width: 40px;
-    background: var(--color-gold-primary);
-  }
-  .section-header--left .section-header__rule:last-child {
-    display: none;
   }
   .section-header--left .section-header__desc {
     margin-inline: 0;
