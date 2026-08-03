@@ -16,6 +16,7 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
       <div class="section-header__ornament" aria-hidden="true">
         <span class="section-header__rule"></span>
         <span class="section-header__diamond">&#9670;</span>
+        <span class="section-header__rule"></span>
       </div>
       <h2 class="section-header__title">{title}</h2>
       {subtitle && <p class="section-header__subtitle">{subtitle}</p>}
@@ -99,12 +100,7 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
     margin: 0 auto 3.5rem;
   }
   .section-header--split .section-header__ornament {
-    justify-content: flex-start;
     margin-bottom: 1.25rem;
-  }
-  .section-header--split .section-header__rule {
-    width: 40px;
-    background: var(--color-gold-primary);
   }
   .section-header--split .section-header__title {
     font-size: 40px;
@@ -114,6 +110,7 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
   .section-header--split .section-header__col--title {
     flex: 0 0 auto;
     max-width: 34rem;
+    text-align: center;
   }
   .section-header--split .section-header__col--desc {
     flex: 1;
