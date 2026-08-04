@@ -18,6 +18,7 @@ const companyName = cfg?.companyName ?? settings.companyName;
 const phone = cfg?.phone ?? settings.phone;
 
 const photo = urlFor(data?.contactImage)?.width(900).url();
+
 ---
 
 <section class="contact" id="contato">
@@ -34,14 +35,14 @@ const photo = urlFor(data?.contactImage)?.width(900).url();
     <div class="contact__form-wrap surface-card">
       <SectionHeader title={title} description={description} />
 
-      <!--
-        TODO (definir antes de publicar): integração de envio.
-        Enquanto nenhum serviço de formulário estático estiver contratado, o
-        envio monta a mensagem e abre o WhatsApp — assim nenhum contato se perde.
-        Para trocar por Web3Forms/Formspree, basta dar um `action` ao <form>
-        e remover o listener em `contact-form.ts`.
-      -->
       <form class="contact__form" id="contact-form" data-phone={phone} data-company={companyName}>
+        <!-- Isca anti-spam: invisível para pessoas, preenchida por robôs. O
+             endpoint descarta o envio quando vem marcada. -->
+        <label class="contact__botcheck">
+          Não preencha este campo
+          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+        </label>
+
         <div class="contact__row">
           <div class="field">
             <label for="contact-name">Nome completo</label>
@@ -64,6 +65,8 @@ const photo = urlFor(data?.contactImage)?.width(900).url();
         </div>
 
         <button type="submit" class="btn btn--primary contact__submit">Enviar mensagem</button>
+
+        <p class="contact__status" id="contact-status" role="status" aria-live="polite"></p>
       </form>
     </div>
   </div>
@@ -170,6 +173,39 @@ const photo = urlFor(data?.contactImage)?.width(900).url();
     width: 100%;
     margin-top: 0.5rem;
   }
+  .contact__submit[disabled] {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  /* Fora da tela em vez de display:none — robôs costumam ignorar campos ocultos */
+  .contact__botcheck {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* Só ocupa espaço depois que há uma mensagem para mostrar */
+  .contact__status {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .contact__status:not(:empty) {
+    margin-top: 1rem;
+  }
+  .contact__status--ok {
+    color: var(--color-gold-bright);
+  }
+  .contact__status--erro {
+    color: #E8A87C;
+  }
+  .contact__status a {
+    color: inherit;
+    text-decoration: underline;
+  }
 
   @media (max-width: 520px) {
     .contact__row {
@@ -181,32 +217,63 @@ const photo = urlFor(data?.contactImage)?.width(900).url();
 
 <script>
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('contact-status');
 
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-
+  /** Monta o link de WhatsApp com os dados preenchidos. */
+  function whatsappFallback(form: HTMLFormElement) {
     const data = new FormData(form);
-    const name = String(data.get('name') || '').trim();
-    const phone = String(data.get('phone') || '').trim();
-    const email = String(data.get('email') || '').trim();
-    const message = String(data.get('message') || '').trim();
-
-    const company = form.dataset.company || '';
-    const target = form.dataset.phone || '';
+    const get = (k: string) => String(data.get(k) || '').trim();
 
     const lines = [
-      `Olá, ${company}! Gostaria de mais informações.`,
+      `Olá, ${form.dataset.company || ''}! Gostaria de mais informações.`,
       '',
-      `Nome: ${name}`,
-      `WhatsApp: ${phone}`,
+      `Nome: ${get('name')}`,
+      `WhatsApp: ${get('phone')}`,
     ];
-    if (email) lines.push(`E-mail: ${email}`);
-    if (message) lines.push('', message);
+    if (get('email')) lines.push(`E-mail: ${get('email')}`);
+    if (get('message')) lines.push('', get('message'));
 
-    window.open(
-      `https://wa.me/${target}?text=${encodeURIComponent(lines.join('\n'))}`,
-      '_blank',
-      'noopener'
-    );
+    return `https://wa.me/${form.dataset.phone || ''}?text=${encodeURIComponent(lines.join('\n'))}`;
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!status) return;
+
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const label = button?.textContent ?? 'Enviar mensagem';
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Enviando…';
+    }
+    status.textContent = '';
+    status.className = 'contact__status';
+
+    try {
+      const dados = Object.fromEntries(new FormData(form).entries());
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(dados),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || 'Falha no envio');
+
+      form.reset();
+      status.className = 'contact__status contact__status--ok';
+      status.textContent = 'Mensagem enviada! Entraremos em contato em breve.';
+    } catch {
+      // Nunca deixa o visitante sem saída: oferece o WhatsApp com o que ele já digitou.
+      status.className = 'contact__status contact__status--erro';
+      status.innerHTML =
+        'Não foi possível enviar agora. ' +
+        `<a href="${whatsappFallback(form)}" target="_blank" rel="noopener noreferrer">Fale conosco pelo WhatsApp</a>.`;
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    }
   });
 </script>

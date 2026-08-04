@@ -26,3 +26,6 @@ pnpm-debug.log*
 # materiais brutos do cliente (PDF, fotos originais) — assets otimizados já
 # estão em src/assets/; originais ficam só localmente
 .context/
+
+# Cache local do Wrangler (Cloudflare)
+.wrangler/
