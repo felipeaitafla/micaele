@@ -10,7 +10,7 @@ export const settings = {
   phone: '5562982045058',
   phoneDisplay: '(62) 98204-5058',
   phone2: '(62) 3637-4234',
-  email: 'marketing@micaellemassagem.com.br',
+  email: 'contato@micaellemassagem.com.br',
   address:
     'R. C 152, Quadra 383 - Lote 20/21 Casa 03 - Jardim América, Goiânia - GO, 74275-120',
   hours1: 'Segunda a Sexta: 10h00 às 19h00',
