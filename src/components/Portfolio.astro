@@ -13,10 +13,11 @@ const localPhotos = Object.values(
 );
 
 const data = await sanityFetch<any>(
-  `*[_type == "homePage"][0]{ portfolioTitle, portfolioImages, portfolioVideos }`
+  `*[_type == "homePage"][0]{ portfolioTitle, portfolioDescription, portfolioImages, portfolioVideos }`
 );
 
 const title = data?.portfolioTitle ?? home.portfolioTitle;
+const description = data?.portfolioDescription ?? home.portfolioDescription;
 const videos = data?.portfolioVideos?.length ? data.portfolioVideos : home.portfolioVideos;
 
 const sanityPhotos: string[] =
@@ -29,7 +30,7 @@ const track = usingSanity ? [...sanityPhotos, ...sanityPhotos] : [...localPhotos
 
 <section class="portfolio section-padding" id="portfolio">
   <div class="container">
-    <SectionHeader title={title} description={home.portfolioDescription} />
+    <SectionHeader title={title} description={description} />
   </div>
 
   <!-- Carrossel infinito: puro CSS, pausa no hover e no foco do teclado -->

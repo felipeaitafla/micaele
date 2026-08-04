@@ -12,10 +12,11 @@ const localPhotos = Object.values(
 );
 
 const data = await sanityFetch<any>(
-  `*[_type == "homePage"][0]{ spaceTitle, spaceImages }`
+  `*[_type == "homePage"][0]{ spaceTitle, spaceDescription, spaceImages }`
 );
 
 const title = data?.spaceTitle ?? home.spaceTitle;
+const description = data?.spaceDescription ?? home.spaceDescription;
 const sanityPhotos: string[] =
   data?.spaceImages?.map((img: any) => urlFor(img)?.width(900).height(1100).fit('crop').url()).filter(Boolean) ?? [];
 const usingSanity = sanityPhotos.length > 0;
@@ -24,7 +25,7 @@ const photos: any[] = usingSanity ? sanityPhotos : localPhotos;
 
 <section class="space section-padding" id="espaco">
   <div class="container">
-    <SectionHeader title={title} description={home.spaceDescription} />
+    <SectionHeader title={title} description={description} />
 
     <ul class="space__grid">
       {photos.map((photo) => (

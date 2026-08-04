@@ -4,19 +4,20 @@ import { sanityFetch } from '../lib/sanity';
 import { home, settings } from '../lib/content';
 
 const data = await sanityFetch<any>(
-  `*[_type == "homePage"][0]{ reviewsTitle }`
+  `*[_type == "homePage"][0]{ reviewsTitle, reviewsDescription }`
 );
 const cfg = await sanityFetch<any>(
   `*[_type == "siteSettings"][0]{ googleReviewsUrl }`
 );
 
 const title = data?.reviewsTitle ?? home.reviewsTitle;
+const description = data?.reviewsDescription ?? home.reviewsDescription;
 const reviewsUrl = cfg?.googleReviewsUrl ?? settings.googleReviewsUrl;
 ---
 
 <section class="reviews section-padding" id="depoimentos">
   <div class="container">
-    <SectionHeader title={title} description={home.reviewsDescription} />
+    <SectionHeader title={title} description={description} />
 
     <!-- Widget ao vivo do Trustindex, puxando as avaliações reais do Google -->
     <div class="reviews__widget">
