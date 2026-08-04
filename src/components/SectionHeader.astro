@@ -165,4 +165,12 @@ const { title, subtitle, description, align = 'center', split = false, equalColu
   .section-header--left .section-header__desc {
     margin-inline: 0;
   }
+
+  /* Mobile: todos os títulos de seção no mesmo tamanho do título do hero */
+  @media (max-width: 900px) {
+    .section-header__title,
+    .section-header--split .section-header__title {
+      font-size: 1.5rem;
+    }
+  }
 </style>
