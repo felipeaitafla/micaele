@@ -8,7 +8,7 @@ import { sanityFetch, urlFor, whatsappUrl } from '../lib/sanity';
 import { home, settings } from '../lib/content';
 
 const data = await sanityFetch<any>(
-  `*[_type == "homePage"][0]{ aboutTitle, aboutText, heroImage }`
+  `*[_type == "homePage"][0]{ aboutTitle, aboutText, aboutImages }`
 );
 const cfg = await sanityFetch<any>(
   `*[_type == "siteSettings"][0]{ companyName, phone }`
@@ -19,43 +19,53 @@ const companyName = cfg?.companyName ?? settings.companyName;
 const phone = cfg?.phone ?? settings.phone;
 const waUrl = whatsappUrl(phone, companyName);
 
-const portrait = urlFor(data?.heroImage)?.width(800).url();
+// Os dois retratos que se alternam. Só usa o Sanity quando há o par completo;
+// com uma foto só a animação não faria sentido.
+const sanityPortraits: string[] =
+  data?.aboutImages
+    ?.map((img: any) => urlFor(img)?.width(800).height(1067).fit('crop').url())
+    .filter(Boolean) ?? [];
+const usingSanity = sanityPortraits.length >= 2;
+
 const hasRichText = Array.isArray(data?.aboutText) && data.aboutText.length > 0;
 ---
 
 <section class="about section-padding" id="quem-somos">
   <div class="container about__inner">
     <div class="about__media">
-      {portrait ? (
-        <div class="about__frame">
-          <img src={portrait} alt={`Equipe da ${companyName}`} loading="lazy" />
-        </div>
-      ) : (
-        /* Os dois retratos se alternam a cada 2,5s. role/aria-label descrevem o
-           conjunto para leitores de tela, por isso cada img fica com alt vazio. */
-        <div
-          class="about__frame about__frame--swap"
-          role="img"
-          aria-label={`Proprietários da ${companyName}`}
-        >
-          <Image
-            src={ela}
-            alt=""
-            class="about__photo about__photo--a"
-            widths={[400, 800]}
-            sizes="(max-width: 900px) 60vw, 34vw"
-            loading="lazy"
-          />
-          <Image
-            src={ele}
-            alt=""
-            class="about__photo about__photo--b"
-            widths={[400, 800]}
-            sizes="(max-width: 900px) 60vw, 34vw"
-            loading="lazy"
-          />
-        </div>
-      )}
+      {/* Os dois retratos se alternam a cada 2,5s. role/aria-label descrevem o
+          conjunto para leitores de tela, por isso cada img fica com alt vazio. */}
+      <div
+        class="about__frame about__frame--swap"
+        role="img"
+        aria-label={`Proprietários da ${companyName}`}
+      >
+        {usingSanity ? (
+          <>
+            <img src={sanityPortraits[0]} alt="" class="about__photo about__photo--a" loading="lazy" decoding="async" />
+            <img src={sanityPortraits[1]} alt="" class="about__photo about__photo--b" loading="lazy" decoding="async" />
+          </>
+        ) : (
+          <>
+            <Image
+              src={ela}
+              alt=""
+              class="about__photo about__photo--a"
+              widths={[400, 800]}
+              sizes="(max-width: 900px) 60vw, 34vw"
+              loading="lazy"
+            />
+            <Image
+              src={ele}
+              alt=""
+              class="about__photo about__photo--b"
+              widths={[400, 800]}
+              sizes="(max-width: 900px) 60vw, 34vw"
+              loading="lazy"
+            />
+          </>
+        )}
+      </div>
     </div>
 
     <div class="about__content">

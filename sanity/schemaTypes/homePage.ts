@@ -326,6 +326,17 @@ export default defineType({
       initialValue: 'Quem somos',
     }),
     defineField({
+      name: 'aboutImages',
+      title: 'Retratos dos Proprietários (2 fotos)',
+      type: 'array',
+      group: 'about',
+      of: [{ type: 'image', options: { hotspot: true } }],
+      options: { layout: 'grid' },
+      validation: (Rule) => Rule.max(2),
+      description:
+        'As duas fotos se alternam automaticamente na seção. Com menos de 2 fotos aqui, o site usa os retratos locais em src/assets/donos/.',
+    }),
+    defineField({
       name: 'aboutText',
       title: 'Texto Quem Somos',
       type: 'array',
