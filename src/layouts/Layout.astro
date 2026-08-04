@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import { sanityFetch } from '../lib/sanity';
 import { settings as fallback } from '../lib/content';
 
-const { title, description } = Astro.props;
+const { title, description, keywords } = Astro.props;
 
 const cfg = await sanityFetch<any>(
   `*[_type == "siteSettings"][0]{ companyName, phone }`
@@ -19,10 +19,13 @@ const phone = cfg?.phone ?? fallback.phone;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="icon" type="image/png" href="/logo.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+		<link rel="icon" type="image/png" sizes="512x512" href="/favicon-mm.png" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title || companyName}</title>
 		{description && <meta name="description" content={description} />}
+		{keywords && <meta name="keywords" content={keywords} />}
 		<meta name="theme-color" content="#14120F" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
