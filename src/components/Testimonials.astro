@@ -4,7 +4,7 @@ import { sanityFetch } from '../lib/sanity';
 import { home, settings } from '../lib/content';
 
 const data = await sanityFetch<any>(
-  `*[_type == "homePage"][0]{ reviewsTitle, reviewsDescription }`
+  `*[_type == "homePage"][0]{ reviewsTitle, reviewsDescription, testimonials }`
 );
 const cfg = await sanityFetch<any>(
   `*[_type == "siteSettings"][0]{ googleReviewsUrl }`
@@ -13,15 +13,51 @@ const cfg = await sanityFetch<any>(
 const title = data?.reviewsTitle ?? home.reviewsTitle;
 const description = data?.reviewsDescription ?? home.reviewsDescription;
 const reviewsUrl = cfg?.googleReviewsUrl ?? settings.googleReviewsUrl;
+
+const reviews = data?.testimonials?.length ? data.testimonials : home.testimonials;
 ---
 
 <section class="reviews section-padding" id="depoimentos">
   <div class="container">
     <SectionHeader title={title} description={description} />
 
-    <!-- Widget ao vivo do Trustindex, puxando as avaliações reais do Google -->
-    <div class="reviews__widget">
-      <script is:inline defer async src="https://cdn.trustindex.io/loader.js?06efc7e7831b445ea9066120dc2"></script>
+    <div class="reviews__carousel">
+      <ul class="reviews__track" role="region" aria-label="Depoimentos de clientes" tabindex="0">
+        {
+          reviews.map((review: any) => (
+            <li class="reviews__card">
+              <span class="reviews__stars" aria-hidden="true">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <svg
+                    viewBox="0 0 24 24"
+                    class:list={['reviews__star', i < (review.rating ?? 5) && 'reviews__star--filled']}
+                  >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                ))}
+              </span>
+              <p class="reviews__text">{review.text}</p>
+              <div class="reviews__footer">
+                <span class="reviews__name">{review.name}</span>
+                {review.time && <span class="reviews__time">{review.time}</span>}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="reviews__controls">
+        <button type="button" class="reviews__arrow" data-dir="prev" aria-label="Depoimento anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button type="button" class="reviews__arrow" data-dir="next" aria-label="Próximo depoimento">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="reviews__cta">
@@ -45,13 +81,174 @@ const reviewsUrl = cfg?.googleReviewsUrl ?? settings.googleReviewsUrl;
     }
   }
 
-  .reviews__widget {
-    min-height: 12rem;
+  .reviews__stars {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  .reviews__star {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: var(--color-hairline);
+  }
+
+  .reviews__star--filled {
+    fill: var(--color-gold-primary);
+  }
+
+  .reviews__carousel {
+    position: relative;
+  }
+
+  .reviews__track {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.25rem 0.25rem 0.75rem;
+    margin: -0.25rem -0.25rem -0.75rem;
+  }
+
+  .reviews__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reviews__card {
+    scroll-snap-align: start;
+    flex: 0 0 calc((100% - 3rem) / 3);
+    min-width: 16rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 4px;
+    padding: 1.75rem;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+  }
+
+  .reviews__card:hover {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 18px 50px -18px rgba(0, 0, 0, 0.7), 0 0 40px var(--color-glow);
+    transform: translateY(-4px);
+  }
+
+  .reviews__card .reviews__stars {
+    margin-bottom: 1rem;
+  }
+
+  .reviews__text {
+    color: var(--color-text-body);
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .reviews__footer {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .reviews__name {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-text-heading);
+  }
+
+  .reviews__time {
+    font-size: 0.8rem;
+    color: var(--color-text-body);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .reviews__card {
+      flex-basis: calc((100% - 1.5rem) / 2);
+    }
+  }
+  @media (max-width: 560px) {
+    .reviews__card {
+      flex-basis: 86%;
+    }
+  }
+
+  .reviews__controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .reviews__arrow {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+    border: 1px solid var(--color-hairline);
+    border-radius: 50%;
+    background-color: var(--color-bg-surface);
+    color: var(--color-gold-primary);
+    cursor: pointer;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease;
+  }
+
+  .reviews__arrow svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .reviews__arrow:hover:not(:disabled) {
+    border-color: var(--color-gold-primary);
+    box-shadow: 0 0 30px var(--color-glow);
+  }
+
+  .reviews__arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
   }
 
   .reviews__cta {
     display: flex;
     justify-content: center;
-    margin-top: 3rem;
+    margin-top: 2.5rem;
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.reviews__carousel').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLUListElement>('.reviews__track');
+    const prevBtn = carousel.querySelector<HTMLButtonElement>('[data-dir="prev"]');
+    const nextBtn = carousel.querySelector<HTMLButtonElement>('[data-dir="next"]');
+    if (!track || !prevBtn || !nextBtn) return;
+
+    const scrollByCard = (dir: number) => {
+      const card = track.querySelector<HTMLElement>('.reviews__card');
+      const gap = parseFloat(getComputedStyle(track).columnGap || '0') || 0;
+      const amount = card ? card.offsetWidth + gap : track.clientWidth;
+      track.scrollBy({ left: amount * dir, behavior: 'smooth' });
+    };
+
+    prevBtn.addEventListener('click', () => scrollByCard(-1));
+    nextBtn.addEventListener('click', () => scrollByCard(1));
+
+    const updateArrows = () => {
+      const max = track.scrollWidth - track.clientWidth - 1;
+      prevBtn.disabled = track.scrollLeft <= 0;
+      nextBtn.disabled = max <= 0 || track.scrollLeft >= max;
+    };
+
+    track.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+  });
+</script>

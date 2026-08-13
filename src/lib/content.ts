@@ -42,17 +42,35 @@ export const home = {
     {
       name: 'Talyane Pereira',
       time: 'há 1 mês',
+      rating: 5,
       text: 'Ambiente aconchegante, climatizado, super limpinho e cheiroso, além de contar com atendimento personalizado, bem profissional. Super recomendo. Agendem suas terapias e garantam bem-estar, relaxamento e autocuidado.',
     },
     {
       name: 'Tânia Maiara Rodrigues',
       time: 'há 9 meses',
+      rating: 5,
       text: 'Espaço maravilhoso, que traz uma ótima energia, além do mais super lindo. Com excelentes profissionais, em especial a Micaele, que é um amor de pessoa e muito educada. Super recomendo.',
     },
     {
       name: 'Zhayne Silva',
       time: 'há 9 meses',
+      rating: 5,
       text: 'Ótimo atendimento! Super indico. Ambiente aconchegante. Quem não conheceu, vale a pena conhecer.',
+    },
+    {
+      name: 'Marcos Paiva',
+      rating: 5,
+      text: 'Ambiente aconchegante, fui muito bem recebido, fui apresentado a uma massagem indiana que não imaginava existir tão sensações. O local achei bem discreto o que me fez ir conhecer. Achei interessante a proposta deles onde não só mulheres fazem massagem mas também homens. Quero voltar pra conhecer outros serviços deles.',
+    },
+    {
+      name: 'Jhonatan Silva',
+      rating: 5,
+      text: 'Maravilhoso, amei o atendimento, ótimos profissionais e um ótimo lugar, muito aconchegante. Me senti à vontade lá, parabéns, ganhou um freguês 👏🏻👏🏻👏🏻👏🏻',
+    },
+    {
+      name: 'Gustavo Henrique',
+      rating: 5,
+      text: 'Ambiente acolhedor e relaxante, profissionais altamente qualificados e um serviço impecável. Recomendo a todos!',
     },
   ],
 
